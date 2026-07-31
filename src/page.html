@@ -432,8 +432,6 @@
   margin-inline: calc(var(--spacing-18) * -1);
   border-top: 1px dashed var(--color-cork-border);
   border-radius: var(--radius-xl);
-  position: relative;
-  overflow: hidden;
   transition: background-color .45s ease;
 }
 .oz-list .oz-row:last-child { border-bottom: 1px dashed var(--color-cork-border); }
@@ -441,46 +439,65 @@
 .oz-row:focus-visible { background-color: rgba(56, 36, 22, 0.42); }
 .oz-row:active { background-color: rgba(56, 36, 22, 0.62); }
 
-/* Site preview, revealed on hover. It is not laid over the canvas —
-   it emerges from it: screen blending means the screenshot's dark
-   pixels stay walnut and only its lit areas surface, so the preview
-   reads as something inside the background rather than on top of it.
-   A mask dissolves all four edges so nothing shows a hard rectangle. */
-.oz-row__preview {
+/* Site preview, revealed on hover — it backs the whole section rather
+   than the row, so the captured page gets room to actually read. It is
+   not laid over the canvas but emerges from it: screen blending keeps
+   the capture's dark pixels at walnut so only lit areas surface, and a
+   two-axis gradient mask dissolves all four edges. */
+.oz-work__stage {
   position: absolute;
   inset: 0;
   z-index: 0;
   overflow: hidden;
-  border-radius: inherit;
-  opacity: 0;
   pointer-events: none;
-  transition: opacity .55s ease;
 }
-.oz-row__preview img {
+.oz-shot {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity .6s ease;
+}
+.oz-shot img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: 50% 52%;
+  object-position: 50% 0;
   mix-blend-mode: screen;
-  /* graded into the palette: cooled down, darkened, warmed back up */
-  filter: grayscale(0.45) brightness(0.62) contrast(1.15) sepia(0.35) saturate(1.25);
   -webkit-mask-image:
-    linear-gradient(to right,  transparent 0%, #000 14%, #000 86%, transparent 100%),
-    linear-gradient(to bottom, transparent 0%, #000 22%, #000 78%, transparent 100%);
+    linear-gradient(to right,  transparent 0%, #000 18%, #000 82%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, #000 16%, #000 78%, transparent 100%);
   mask-image:
-    linear-gradient(to right,  transparent 0%, #000 14%, #000 86%, transparent 100%),
-    linear-gradient(to bottom, transparent 0%, #000 22%, #000 78%, transparent 100%);
+    linear-gradient(to right,  transparent 0%, #000 18%, #000 82%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, #000 16%, #000 78%, transparent 100%);
   -webkit-mask-composite: source-in;
   mask-composite: intersect;
-  transform: scale(1.06);
-  transition: transform 1.2s cubic-bezier(.16,.84,.3,1);
+  transform: scale(1.05);
+  transition: transform 1.4s cubic-bezier(.16,.84,.3,1);
 }
-.oz-row:hover .oz-row__preview,
-.oz-row:focus-visible .oz-row__preview { opacity: 0.7; }
-.oz-row:hover .oz-row__preview img { transform: scale(1); }
 
-/* row content has to sit above the preview */
-.oz-row > *:not(.oz-row__preview) { position: relative; z-index: 1; }
+/* :has() lets a row drive a layer that is not its descendant. Without
+   support the preview simply never appears; nothing else depends on it. */
+.oz-work:has(.oz-row[data-shot="scholr"]:hover)         .oz-shot[data-for="scholr"],
+.oz-work:has(.oz-row[data-shot="scholr"]:focus-visible) .oz-shot[data-for="scholr"],
+.oz-work:has(.oz-row[data-shot="learningforest"]:hover)         .oz-shot[data-for="learningforest"],
+.oz-work:has(.oz-row[data-shot="learningforest"]:focus-visible) .oz-shot[data-for="learningforest"],
+.oz-work:has(.oz-row[data-shot="agencymart"]:hover)         .oz-shot[data-for="agencymart"],
+.oz-work:has(.oz-row[data-shot="agencymart"]:focus-visible) .oz-shot[data-for="agencymart"],
+.oz-work:has(.oz-row[data-shot="tourstack"]:hover)         .oz-shot[data-for="tourstack"],
+.oz-work:has(.oz-row[data-shot="tourstack"]:focus-visible) .oz-shot[data-for="tourstack"] {
+  opacity: 0.7;
+}
+.oz-work:has(.oz-row:hover) .oz-shot img { transform: scale(1); }
+
+/* While a capture is showing, the row bands settle back toward walnut.
+   Raw contrast already passes, but the capture carries its own body copy
+   and text sitting on text is hard to read regardless of ratio. The
+   preview stays vivid in the gaps and around the heading. */
+.oz-work:has(.oz-row:hover) .oz-row { background-color: rgba(16, 9, 4, 0.62); }
+.oz-work:has(.oz-row:hover) .oz-row:hover { background-color: rgba(56, 36, 22, 0.5); }
+
+/* section content sits above the stage */
+.oz-work > *:not(.oz-work__stage) { position: relative; z-index: 1; }
 
 .oz-row__spec { color: var(--tone-muted); transition: color .35s ease; }
 .oz-row:hover .oz-row__spec { color: var(--color-warm-cream); }
@@ -671,7 +688,7 @@
     opacity: 1; transform: none; animation: none; transition: none;
   }
   .oz *, .oz *::before, .oz *::after { transition-duration: .01ms !important; }
-  .oz-row__preview img { transform: none; }
+  .oz-shot img { transform: none; }
 }
 </style>
 
@@ -729,38 +746,41 @@
 
     <!-- ============ WORKBENCH ============ -->
     <section class="oz-section oz-work" id="workbench" tabindex="-1">
+      <div class="oz-work__stage" aria-hidden="true">
+        <span class="oz-shot" data-for="scholr"><img src="__SHOT_SCHOLR__" alt="" loading="lazy" decoding="async"></span>
+        <span class="oz-shot" data-for="learningforest"><img src="__SHOT_LEARNINGFOREST__" alt="" loading="lazy" decoding="async"></span>
+        <span class="oz-shot" data-for="agencymart"><img src="__SHOT_AGENCYMART__" alt="" loading="lazy" decoding="async"></span>
+        <span class="oz-shot" data-for="tourstack"><img src="__SHOT_TOURSTACK__" alt="" loading="lazy" decoding="async"></span>
+      </div>
+
       <div class="oz-work__head oz-rise">
         <h2 class="oz-h">These are the tools, <br>not the artifact.</h2>
         <p class="oz-label oz-ember">&#42; Vibe coded &#183; All live</p>
       </div>
 
       <div class="oz-list">
-        <a class="oz-row oz-rise" href="https://getscholr.vercel.app/" target="_blank" rel="noopener noreferrer">
-          <span class="oz-row__preview" aria-hidden="true"><img src="__SHOT_SCHOLR__" alt="" loading="lazy" decoding="async"></span>
+        <a class="oz-row oz-rise" href="https://getscholr.vercel.app/" target="_blank" rel="noopener noreferrer" data-shot="scholr">
           <span class="oz-label oz-row__spec">Spec. 01</span>
           <h3 class="oz-row__name">Scholr</h3>
           <p class="oz-row__note">Attendance, homework, messages and weekly progress &#8212; one feed for parents, teachers and admins.</p>
           <span class="oz-row__go">getscholr.vercel.app <span class="oz-arrow" aria-hidden="true">&#8594;</span></span>
         </a>
 
-        <a class="oz-row oz-rise" href="https://www.learningforest.co/" target="_blank" rel="noopener noreferrer">
-          <span class="oz-row__preview" aria-hidden="true"><img src="__SHOT_LEARNINGFOREST__" alt="" loading="lazy" decoding="async"></span>
+        <a class="oz-row oz-rise" href="https://www.learningforest.co/" target="_blank" rel="noopener noreferrer" data-shot="learningforest">
           <span class="oz-label oz-row__spec">Spec. 02</span>
           <h3 class="oz-row__name">Learning Forest</h3>
           <p class="oz-row__note">Personalised paths for homeschooled kids. Four subjects, planned weekly, compliance tracked.</p>
           <span class="oz-row__go">learningforest.co <span class="oz-arrow" aria-hidden="true">&#8594;</span></span>
         </a>
 
-        <a class="oz-row oz-rise" href="https://drahye.github.io/claude-project-1/#/" target="_blank" rel="noopener noreferrer">
-          <span class="oz-row__preview" aria-hidden="true"><img src="__SHOT_AGENCYMART__" alt="" loading="lazy" decoding="async"></span>
+        <a class="oz-row oz-rise" href="https://drahye.github.io/claude-project-1/#/" target="_blank" rel="noopener noreferrer" data-shot="agencymart">
           <span class="oz-label oz-row__spec">Spec. 03</span>
           <h3 class="oz-row__name">Agency Mart</h3>
           <p class="oz-row__note">A single storefront for creative services &#8212; browse, compare and commission.</p>
           <span class="oz-row__go">drahye.github.io <span class="oz-arrow" aria-hidden="true">&#8594;</span></span>
         </a>
 
-        <a class="oz-row oz-rise" href="https://drahye.github.io/tourstack-preview/tourstack-landing.html" target="_blank" rel="noopener noreferrer">
-          <span class="oz-row__preview" aria-hidden="true"><img src="__SHOT_TOURSTACK__" alt="" loading="lazy" decoding="async"></span>
+        <a class="oz-row oz-rise" href="https://drahye.github.io/tourstack-preview/tourstack-landing.html" target="_blank" rel="noopener noreferrer" data-shot="tourstack">
           <span class="oz-label oz-row__spec">Spec. 04</span>
           <h3 class="oz-row__name">TourStack</h3>
           <p class="oz-row__note">Escrow, compliance and insurance for financing live tours across 24+ African markets.</p>

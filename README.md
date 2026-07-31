@@ -76,10 +76,21 @@ single path is pathologically slow to rasterise and will stall the main thread.
 
 ## Hover previews
 
-Each workbench row reveals a screenshot of that site on hover. It is not laid over
-the canvas — it emerges from it: `mix-blend-mode: screen` means the screenshot's
-dark pixels stay walnut and only its lit areas surface, and a two-axis gradient
-mask dissolves all four edges so no hard rectangle ever shows.
+Hovering a workbench row fills the whole section behind it with a screenshot of
+that site. It backs the section rather than the row, so the captured page has room
+to read — clipped inside a row it was a letterbox band showing little more than a
+nav bar. It is not laid over the canvas but emerges from it: `mix-blend-mode:
+screen` means the screenshot's dark pixels stay walnut and only its lit areas
+surface, and a two-axis gradient mask dissolves all four edges.
+
+A row drives a layer that is not its descendant, via `:has()` on the section.
+Where `:has()` is unsupported the preview simply never appears and nothing else
+is affected.
+
+While a capture is showing, the row bands settle back toward walnut. Raw contrast
+already passes, but the captures carry their own body copy, and text sitting on
+text is hard to read regardless of ratio. The preview stays vivid in the gaps
+between rows and around the heading.
 
 The captures are normalised at build time, not in CSS, because the four sites are
 not tonally comparable — Scholr and Learning Forest are light themed (mean
@@ -99,9 +110,6 @@ Two constraints that look arbitrary and are not:
   cream (L = 0.836) at the preview's 0.7 opacity for 4.5:1 gives a ceiling of 125,
   and the cap is applied *after* the warm tint, since tinting a 150 cap pushed it
   back to 157 and contrast to 3.0:1.
-
-Rows are padded to 41px rather than 24px: the preview is a wide short band, and at
-24px it cropped to little more than the site's nav bar.
 
 Regenerating: `node tools/capture-shots.mjs` then `python3 tools/grade-shots.py`.
 The raw captures land in `tools/shots/` and are gitignored — they are ~1MB and the

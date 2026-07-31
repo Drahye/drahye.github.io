@@ -21,8 +21,8 @@ OUT = ROOT / "src" / "img"
 SITES = ["scholr", "learningforest", "agencymart", "tourstack"]
 
 TARGET_MEAN = 70          # where every preview ends up, whatever it started at
-CROP_FRACTION = 0.55      # keep the top band: nav plus headline
-WIDTH = 1200
+CROP_FRACTION = 1.0       # the preview backs the whole section, so keep the whole page
+WIDTH = 1280
 WARM = (1.05, 0.965, 0.84)  # nudge toward the walnut / ember family
 DESATURATE = 0.55
 
