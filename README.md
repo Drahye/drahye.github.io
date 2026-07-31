@@ -74,6 +74,41 @@ edge-on. Disabled under `prefers-reduced-motion` and on coarse pointers.
 Points are stamped from pre-rendered sprites. Batching thousands of arcs into a
 single path is pathologically slow to rasterise and will stall the main thread.
 
+## Hover previews
+
+Each workbench row reveals a screenshot of that site on hover. It is not laid over
+the canvas — it emerges from it: `mix-blend-mode: screen` means the screenshot's
+dark pixels stay walnut and only its lit areas surface, and a two-axis gradient
+mask dissolves all four edges so no hard rectangle ever shows.
+
+The captures are normalised at build time, not in CSS, because the four sites are
+not tonally comparable — Scholr and Learning Forest are light themed (mean
+brightness 215 and 239), Agency Mart and TourStack are dark (26 and 19). A single
+CSS filter cannot serve both; screen-blending the light pair would have produced
+white slabs. `tools/grade-shots.py` brings all four into one range: means of 57-66,
+a spread of 9.2 where they started 223.3 apart. (Normalisation alone gets the
+spread to 0.6; the highlight cap below then pulls the darker captures down a
+little further, which is the right trade.)
+
+Two constraints that look arbitrary and are not:
+
+- **Darkening uses a linear scale, lifting uses gamma.** Gamma cannot darken a
+  white pixel — `255 ** n == 255` — so a single gamma left Scholr's white regions
+  intact and the mean stuck at 133. Linear scaling is exact when reducing.
+- **Highlights are capped at 125.** The row's cream copy sits over this. Solving
+  cream (L = 0.836) at the preview's 0.7 opacity for 4.5:1 gives a ceiling of 125,
+  and the cap is applied *after* the warm tint, since tinting a 150 cap pushed it
+  back to 157 and contrast to 3.0:1.
+
+Rows are padded to 41px rather than 24px: the preview is a wide short band, and at
+24px it cropped to little more than the site's nav bar.
+
+Regenerating: `node tools/capture-shots.mjs` then `python3 tools/grade-shots.py`.
+The raw captures land in `tools/shots/` and are gitignored — they are ~1MB and the
+capture script rebuilds them. Note that headless Brave/Chrome does not work on
+macOS 13 (`--headless=new` hangs, `--headless=old` exits 0 without writing a file,
+failing on CVDisplayLink), and current Playwright dropped mac13 — pin 1.49.1.
+
 ## Licences
 
 Instrument Sans is under the SIL Open Font License — see

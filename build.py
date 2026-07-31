@@ -47,6 +47,11 @@ def main() -> None:
     assets = [(t, SRC / "fonts" / f, "font/woff2") for t, f in FONTS.items()]
     assets.append(("__PORTRAIT__", SRC / "img" / "portrait.webp", "image/webp"))
 
+    # hover previews for the workbench rows
+    for slug in ("scholr", "learningforest", "agencymart", "tourstack"):
+        assets.append((f"__SHOT_{slug.upper()}__",
+                       SRC / "img" / f"shot-{slug}.webp", "image/webp"))
+
     for token, path, mime in assets:
         if token not in page:
             raise SystemExit(f"build: placeholder {token} not found in src/page.html")
