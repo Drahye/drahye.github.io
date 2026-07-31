@@ -270,7 +270,7 @@
 
 /* ---------- hero ---------- */
 
-.oz-hero { justify-content: space-between; }
+.oz-hero { justify-content: flex-start; }
 
 .oz-hero__photo {
   position: absolute;
@@ -301,12 +301,16 @@
 .oz-hero__top {
   position: relative;
   z-index: 1;
+  /* takes the free space and centres the lockup inside it, so the block
+     sits mid-hero rather than riding the top edge. align-items keeps
+     every left edge flush — the system never centre-aligns headings. */
+  flex: 1;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   align-items: flex-start;
   gap: var(--spacing-18);
   max-width: 58%;
-  padding-top: var(--spacing-45);
 }
 
 .oz-hero__tagline {
@@ -569,7 +573,7 @@
 @media (max-width: 860px) {
   .oz-serial { display: none; }
   .oz-hero { justify-content: flex-end; padding-top: calc(42svh + var(--spacing-24)); }
-  .oz-hero__top { max-width: none; padding-top: 0; }
+  .oz-hero__top { max-width: none; flex: none; }
   .oz-hero__photo { width: 100%; height: 54svh; bottom: auto; }
   .oz-hero__photo img { object-position: 56% 16%; }
   .oz-hero__photo::after {
