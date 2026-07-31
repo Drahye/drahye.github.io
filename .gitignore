@@ -1,0 +1,8 @@
+.DS_Store
+__pycache__/
+
+# body-only build variant, for Claude Artifact publishing rather than Pages
+artifact.html
+
+# local preview server config
+.claude/launch.json
