@@ -204,19 +204,30 @@
 
 /* ---------- Vertical Sidebar Label ---------- */
 
+/* The system calls this a product serial number. On a real object the
+   serial plate is what points you at the datasheet, so it carries the
+   CV. min-width lifts the hit area to 44px without shifting the type. */
 .oz-serial {
   position: fixed;
   top: 50%;
   right: 0;
   z-index: 30;
   transform: translateY(-50%);
-  padding-right: var(--spacing-8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  padding-block: var(--spacing-14);
   writing-mode: vertical-rl;
   font-size: var(--text-xs2);
   line-height: var(--leading-xs2);
   font-weight: var(--font-weight-medium);
   color: var(--tone-muted);
+  transition: color .35s ease;
 }
+.oz-serial:hover,
+.oz-serial:focus-visible { color: var(--color-warm-cream); }
+.oz-serial:active { color: var(--color-driftwood); }
 
 /* ---------- buttons ---------- */
 
@@ -263,6 +274,8 @@
 .oz-ghost:hover,
 .oz-ghost:focus-visible { background-color: rgba(255, 237, 215, 0.08); }
 .oz-ghost:active { background-color: rgba(255, 237, 215, 0.16); }
+
+.oz-actions { display: flex; gap: var(--spacing-12); flex-wrap: wrap; }
 
 .oz-arrow { transition: transform .45s cubic-bezier(.2,.7,.2,1); }
 .oz-pill:hover .oz-arrow,
@@ -529,6 +542,9 @@
   font-size: var(--text-heading-sm);
   line-height: var(--leading-heading-sm);
   font-weight: var(--font-weight-medium);
+  /* an address is data, not a label — lowercase is how it is actually
+     written, and it reads faster than 25 uppercase characters */
+  text-transform: lowercase;
   border-bottom: 1px solid var(--color-cork-border);
   padding-bottom: var(--spacing-6);
   transition: border-color .35s ease;
@@ -602,9 +618,7 @@
   .oz-nav { justify-content: flex-end; }
   .oz-card { max-width: none; }
   .oz-contact__foot { flex-direction: column; align-items: flex-start; gap: var(--spacing-8); }
-  /* the address has no break opportunity, so it steps down a stop on
-     the scale rather than wrapping mid-word or running off the screen */
-  .oz-contact__mail { font-size: var(--text-subheading); line-height: var(--leading-subheading); }
+
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -621,14 +635,18 @@
   <nav class="oz-nav" aria-label="Primary">
     <a class="oz-nav__mark" href="#index">Ayoola</a>
     <ul class="oz-nav__list">
-      <li><a class="oz-nav__link" href="#index" data-nav>Intro</a></li>
+      <!-- the system caps this at four items; the wordmark already
+           links to the top, so Intro was a duplicate and Resume takes
+           its slot. No data-nav on Resume: it leaves the page, so it
+           never participates in the scroll-spy. -->
       <li><a class="oz-nav__link" href="#workbench" data-nav>Work</a></li>
       <li><a class="oz-nav__link" href="#portfolio" data-nav>Portfolio</a></li>
+      <li><a class="oz-nav__link" href="https://drive.google.com/file/d/1YOgOPFXzD92kVUSukl2UNm5_3XFZ8Ema/view?usp=sharing" target="_blank" rel="noopener noreferrer">Resume</a></li>
       <li><a class="oz-nav__link" href="#contact" data-nav>Contact</a></li>
     </ul>
   </nav>
 
-  <span class="oz-serial" aria-hidden="true">Ayoola 1&#8212;Index</span>
+  <a class="oz-serial" href="https://drive.google.com/file/d/1YOgOPFXzD92kVUSukl2UNm5_3XFZ8Ema/view?usp=sharing" target="_blank" rel="noopener noreferrer">Ayoola 1&#8212;Index &#183; CV</a>
 
   <main>
     <!-- ============ HERO ============ -->
@@ -729,9 +747,12 @@
         <p class="oz-label oz-ember oz-rise">&#42; Available for product design work</p>
         <h2 class="oz-h oz-rise">Say something <br>worth reading.</h2>
         <a class="oz-contact__mail oz-rise" href="mailto:abrahamayoola35@gmail.com">abrahamayoola35@gmail.com</a>
-        <div class="oz-rise">
+        <div class="oz-actions oz-rise">
           <a class="oz-ghost" href="mailto:abrahamayoola35@gmail.com">
             Send an email <span class="oz-arrow" aria-hidden="true">&#8594;</span>
+          </a>
+          <a class="oz-ghost" href="https://drive.google.com/file/d/1YOgOPFXzD92kVUSukl2UNm5_3XFZ8Ema/view?usp=sharing" target="_blank" rel="noopener noreferrer">
+            Read the CV <span class="oz-arrow" aria-hidden="true">&#8594;</span>
           </a>
         </div>
       </div>
